@@ -63,7 +63,7 @@ public class SchoolServlet extends HttpServlet {
             schoolService.save(schoolDto);
             resp.setStatus(HttpServletResponse.SC_CREATED);
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to save school.");
         }
     }
 

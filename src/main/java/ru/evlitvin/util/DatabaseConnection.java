@@ -22,7 +22,7 @@ public final class DatabaseConnection {
         try (InputStream input = Files.newInputStream(Paths.get("C:\\database.properties"))) {
             properties.load(input);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to load database properties", e);
         }
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(properties.getProperty("jdbc.url"));
