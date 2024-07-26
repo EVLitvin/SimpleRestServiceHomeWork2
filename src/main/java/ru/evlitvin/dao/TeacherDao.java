@@ -19,9 +19,9 @@ public class TeacherDao implements CrudDAOInterface<Teacher> {
 
     private static final String INSERT = "INSERT INTO teacher (first_name, last_name, school_id) VALUES (?, ?, ?)";
     private static final String FIND_BY_ID = "SELECT t.id, t.first_name, t.last_name, t.school_id, s.name, s.address " +
-            "FROM teacher t JOIN school s ON t.school_id = s.id WHERE t.id = ?";
+            "FROM teacher t LEFT JOIN school s ON t.school_id = s.id WHERE t.id = ?";
     private static final String FIND_ALL = "SELECT t.id, t.first_name, t.last_name, t.school_id, s.name, s.address " +
-            "FROM teacher t JOIN school s ON t.school_id = s.id";
+            "FROM teacher t LEFT JOIN school s ON t.school_id = s.id";
     private static final String UPDATE = "UPDATE teacher SET first_name = ?, last_name = ?, school_id = ? WHERE id = ?";
     private static final String DELETE = "DELETE FROM teacher WHERE id = ?";
 
@@ -94,8 +94,8 @@ public class TeacherDao implements CrudDAOInterface<Teacher> {
 
     @Override
     public void delete(Long id) throws SQLException {
-        try (Connection connection = dataSource.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(DELETE);
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(DELETE)) {
             statement.setLong(1, id);
             statement.executeUpdate();
         }
