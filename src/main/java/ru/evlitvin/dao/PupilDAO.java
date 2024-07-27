@@ -23,9 +23,10 @@ public class PupilDAO implements CrudDAOInterface<Pupil>, PupilDAOInterface {
     private static final String FIND_BY_ID = "SELECT id, first_name, last_name FROM pupil WHERE id = ?";
     private static final String UPDATE = "UPDATE pupil SET first_name = ?, last_name = ? WHERE id = ?";
     private static final String DELETE = "DELETE FROM pupil WHERE id = ?";
+    private static final String INSERT_INTO_PUPIL_TEACHER = "INSERT INTO pupil_teacher (pupil_id, teacher_id) VALUES (?, ?)";
     private static final String FIND_PUPILS_BY_TEACHER = "SELECT p.* FROM pupil p INNER JOIN pupil_teacher pt ON p.id = pt.pupil_id WHERE pt.teacher_id = ?";
     private static final String DELETE_PUPIL_FROM_TEACHER = "DELETE FROM pupil_teacher WHERE pupil_id = ? AND teacher_id = ?";
-    private final static String FIND_TEACHERS_BY_PUPIL = "SELECT t.* FROM  teacher t INNER JOIN pupil_teacher pt ON t.id = pt.teacher_id WHERE pt.pupil_id = ?";
+    private static final String FIND_TEACHERS_BY_PUPIL = "SELECT t.* FROM  teacher t INNER JOIN pupil_teacher pt ON t.id = pt.teacher_id WHERE pt.pupil_id = ?";
 
     @Override
     public void insert(Pupil pupil) throws SQLException {
@@ -49,11 +50,7 @@ public class PupilDAO implements CrudDAOInterface<Pupil>, PupilDAOInterface {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(FIND_ALL)) {
             while (resultSet.next()) {
-                Pupil pupil = new Pupil();
-                pupil.setId(resultSet.getLong("id"));
-                pupil.setFirstName(resultSet.getString("first_name"));
-                pupil.setLastName(resultSet.getString("last_name"));
-                pupils.add(pupil);
+                pupils.add(setPupilData(resultSet));
             }
         }
         return pupils;
@@ -61,16 +58,13 @@ public class PupilDAO implements CrudDAOInterface<Pupil>, PupilDAOInterface {
 
     @Override
     public Pupil findById(Long id) throws SQLException {
-        Connection connection = dataSource.getConnection();
-        PreparedStatement statement = connection.prepareStatement(FIND_BY_ID);
-        statement.setLong(1, id);
-        ResultSet resultSet = statement.executeQuery();
-        if (resultSet.next()) {
-            Pupil pupil = new Pupil();
-            pupil.setId(resultSet.getLong("id"));
-            pupil.setFirstName(resultSet.getString("first_name"));
-            pupil.setLastName(resultSet.getString("last_name"));
-            return pupil;
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(FIND_BY_ID)) {
+            statement.setLong(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return setPupilData(resultSet);
+            }
         }
         return null;
     }
@@ -97,9 +91,8 @@ public class PupilDAO implements CrudDAOInterface<Pupil>, PupilDAOInterface {
 
     @Override
     public void addPupilToTeacherList(Long pupilId, Long teacherId) throws SQLException {
-        String query = "INSERT INTO pupil_teacher (pupil_id, teacher_id) VALUES (?, ?)";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement = connection.prepareStatement(INSERT_INTO_PUPIL_TEACHER)) {
             statement.setLong(1, pupilId);
             statement.setLong(2, teacherId);
             statement.executeUpdate();
@@ -115,11 +108,7 @@ public class PupilDAO implements CrudDAOInterface<Pupil>, PupilDAOInterface {
             statement.setLong(1, teacherId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    Pupil pupil = new Pupil();
-                    pupil.setId(resultSet.getLong("id"));
-                    pupil.setFirstName(resultSet.getString("first_name"));
-                    pupil.setLastName(resultSet.getString("last_name"));
-                    pupils.add(pupil);
+                    pupils.add(setPupilData(resultSet));
                 }
             }
         }
@@ -152,5 +141,13 @@ public class PupilDAO implements CrudDAOInterface<Pupil>, PupilDAOInterface {
             }
         }
         return teachers;
+    }
+
+    private Pupil setPupilData(ResultSet resultSet) throws SQLException {
+        Pupil pupil = new Pupil();
+        pupil.setId(resultSet.getLong("id"));
+        pupil.setFirstName(resultSet.getString("first_name"));
+        pupil.setLastName(resultSet.getString("last_name"));
+        return pupil;
     }
 }

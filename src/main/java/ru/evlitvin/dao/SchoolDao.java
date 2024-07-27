@@ -27,8 +27,8 @@ public class SchoolDao implements CrudDAOInterface<School> {
 
     @Override
     public void insert(School school) throws SQLException {
-        try (Connection connection = dataSource.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS);
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, school.getName());
             statement.setString(2, school.getAddress());
             statement.executeUpdate();
@@ -42,8 +42,8 @@ public class SchoolDao implements CrudDAOInterface<School> {
 
     @Override
     public List<School> findAll() throws SQLException {
-        try (Connection connection = dataSource.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(FIND_ALL);
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(FIND_ALL)) {
             ResultSet resultSet = statement.executeQuery();
             List<School> schools = new ArrayList<>();
             School currentSchool = null;
@@ -72,8 +72,8 @@ public class SchoolDao implements CrudDAOInterface<School> {
 
     @Override
     public School findById(Long id) throws SQLException {
-        try (Connection connection = dataSource.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(FIND_BY_ID);
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(FIND_BY_ID)) {
             statement.setLong(1, id);
             ResultSet resultSet = statement.executeQuery();
             School school = null;
@@ -103,8 +103,8 @@ public class SchoolDao implements CrudDAOInterface<School> {
 
     @Override
     public void update(School school) throws SQLException {
-        try (Connection connection = dataSource.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(UPDATE);
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(UPDATE)) {
             statement.setString(1, school.getName());
             statement.setString(2, school.getAddress());
             statement.setLong(3, school.getId());
@@ -114,8 +114,8 @@ public class SchoolDao implements CrudDAOInterface<School> {
 
     @Override
     public void delete(Long id) throws SQLException {
-        try (Connection connection = dataSource.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(DELETE);
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(DELETE)) {
             statement.setLong(1, id);
             statement.executeUpdate();
         }
