@@ -5,7 +5,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import ru.evlitvin.dao.TeacherDao;
 import ru.evlitvin.dto.TeacherDto;
 import ru.evlitvin.entity.Teacher;
@@ -19,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 @DisplayName("Tests for TeacherService class")
 class TeacherServiceTest {
@@ -34,7 +34,7 @@ class TeacherServiceTest {
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
+        openMocks(this);
     }
 
     @Test

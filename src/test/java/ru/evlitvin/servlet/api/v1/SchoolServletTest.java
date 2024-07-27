@@ -6,7 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import ru.evlitvin.dto.SchoolDto;
 import ru.evlitvin.service.SchoolService;
 
@@ -20,6 +19,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 @DisplayName("Tests for SchoolServlet class")
 class SchoolServletTest {
@@ -40,7 +40,7 @@ class SchoolServletTest {
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
+        openMocks(this);
     }
 
     @Test
@@ -321,4 +321,11 @@ class SchoolServletTest {
         verify(response, never()).setStatus(anyInt());
     }
 
+    @Test
+    void doGetThrowsSQLExceptionCatchServletExceptionTest() throws SQLException {
+        when(request.getPathInfo()).thenReturn("/" + 1);
+        doThrow(SQLException.class).when(schoolService).getById(1L);
+
+        assertThrows(ServletException.class, () -> schoolServlet.doGet(request, response));
+    }
 }
